@@ -9,10 +9,7 @@ from xml.etree import ElementTree
 import pytest
 from saltfactories.utils import cli_scripts
 from tests.support.helpers import skip_if_binaries_missing, slowTest
-from tests.support.saltfactories_compat import (
-    ContainerFactory,
-    SaltVirtMinionContainerFactory,
-)
+from tests.support.virt import SaltVirtMinionContainerFactory
 
 docker = pytest.importorskip("docker")
 
@@ -26,7 +23,7 @@ def docker_client():
     urllib3_connectionpool_handler.setLevel(logging.INFO)
     try:
         client = docker.from_env()
-        connectable = ContainerFactory.client_connectable(client)
+        connectable = SaltVirtMinionContainerFactory.client_connectable(client)
         if connectable is not True:  # pragma: no cover
             pytest.skip(connectable)
         client.images.pull("quay.io/rst0git/virt-minion")
@@ -67,7 +64,7 @@ def virt_minion_0(
 ):
     salt_master.id = salt_master.config["id"]
     root_dir = pathlib.Path(
-        salt_factories._get_root_dir_for_daemon(virt_minion_0_id).strpath
+        salt_factories.get_root_dir_for_daemon(virt_minion_0_id).strpath
     )
     config_defaults = {
         "root_dir": str(root_dir),
@@ -116,7 +113,7 @@ def virt_minion_1(
 ):
     salt_master.id = salt_master.config["id"]
     root_dir = pathlib.Path(
-        salt_factories._get_root_dir_for_daemon(virt_minion_1_id).strpath
+        salt_factories.get_root_dir_for_daemon(virt_minion_1_id).strpath
     )
     config_defaults = {
         "root_dir": str(root_dir),
